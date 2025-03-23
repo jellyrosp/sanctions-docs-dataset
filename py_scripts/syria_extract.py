@@ -102,10 +102,15 @@ def extract_syria_data():
     syria_df["Name"] = syria_df["Name"].str.replace(r"\(\)", "", regex=True).str.strip()
     syria_df["Gender"] = syria_df["Gender"].str.lower().str.strip()
     syria_df.replace({"██████": "unknown",}, inplace=True)
+    syria_df = syria_df[~syria_df.apply(lambda row: (row == 'unknown').all(), axis=1)]
     syria_df["Dates"] = syria_df["Dates"].str.strip()
-    syria_df["Dates"] = syria_df["Dates"].apply(format_date)         
+    syria_df["Dates"] = syria_df["Dates"].apply(format_date) 
 
-    return syria_df.to_csv(csv_path, index=False)
+
+    #print(len(names), len(genders), len(reasons), len(dates))
+    print(syria_df.info())
+    #return syria_df.to_csv(csv_path, index=False)
 
 
 extract_syria_data()
+
