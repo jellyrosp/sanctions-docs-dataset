@@ -108,8 +108,8 @@ def extract_EU_syria_data():
 
 
     #print(len(names), len(genders), len(reasons), len(dates))
-    print(syria_df.info())
-    #return syria_df.to_csv(csv_path, index=False)
+    #print(syria_df.info())
+    return syria_df.to_csv(csv_path, index=False)
 
 
 extract_EU_syria_data()
