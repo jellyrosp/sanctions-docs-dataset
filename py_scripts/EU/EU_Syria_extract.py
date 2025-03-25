@@ -2,9 +2,9 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
 
-html_path = "sanctions/EU/Syria/Consolidated_TEXT_32012R0036_25.11.2024/Consolidated_TEXT_32012R0036_25.11.2024_CLEANED.html"
+html_path = "sanctions/EU/Syria/32012R0036_25.11.2024/Consolidated_TEXT_32012R0036_25.11.2024_CLEANED.html"
 
-csv_path = "sanctions/EU/Syria/Consolidated_TEXT_32012R0036_25.11.2024/EU_syria_data.csv"
+csv_path = "sanctions/EU/Syria/32012R0036_25.11.2024/EU_syria_data.csv"
 
 def format_date(date_str):
     try:
