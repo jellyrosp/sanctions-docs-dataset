@@ -107,6 +107,8 @@ def extract_EU_russia_data():
     russia_df["Dates"] = russia_df["Dates"].str.strip()
     russia_df["Dates"] = russia_df["Dates"].apply(format_date) 
 
+    female_count = russia_df["Gender"].str.lower().value_counts().get("female", 0)
+    print("Number of females:", female_count)
 
     #print(len(names), len(genders), len(reasons), len(dates))
     #print(russia_df.info())
