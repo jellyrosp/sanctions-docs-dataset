@@ -4,7 +4,7 @@ from datetime import datetime
 
 html_path = "sanctions/EU/Syria/Consolidated_TEXT_32012R0036_25.11.2024/Consolidated_TEXT_32012R0036_25.11.2024_CLEANED.html"
 
-csv_path = "sanctions/EU/Syria/Consolidated_TEXT_32012R0036_25.11.2024/syria_data.csv"
+csv_path = "sanctions/EU/Syria/Consolidated_TEXT_32012R0036_25.11.2024/EU_syria_data.csv"
 
 def format_date(date_str):
     try:
@@ -12,7 +12,7 @@ def format_date(date_str):
     except ValueError:
         return "unknown"
 
-def extract_syria_data():
+def extract_EU_syria_data():
 
     with open(html_path, "r", encoding="utf-8") as file:
         html_content = file.read()
@@ -112,5 +112,5 @@ def extract_syria_data():
     #return syria_df.to_csv(csv_path, index=False)
 
 
-extract_syria_data()
+extract_EU_syria_data()
 
