@@ -17,26 +17,38 @@ def extract_EU_russia_data():
     with open(html_path, "r", encoding="utf-8") as file:
         html_content = file.read()
         soup = BeautifulSoup(html_content, "html.parser")
-        tables = soup.find_all("table", class_="borderOj")  
+        tables = soup.find_all("table")
     
     names = []
     genders = []
     reasons = []
     dates = []
+    doc_title = []
+    doc_number = []
+    doc_url = []
+    nationality = [] 
+
 
     for table in tables:
-        rows = table.find_all("tr")[1:]
+        table_class = table.get("class", [])
+        rows = table.find_all("tr")[1:]  # Skip header row
+
         for row in rows:
             cols = row.find_all("td")
-            if len(cols) > 1:  # Ensure there are enough columns
-                name_tag = cols[1].find("p", class_="tbl-norm")  # Get <p> inside the Name column
+            if len(cols) > 1:
+                name_tag = cols[1].find("p", class_="tbl-norm")
                 if name_tag:
-                    # # Remove images inside the <p> tag
-                    # for img in name_tag.find_all("img"):
-                    #     img.extract()
-                    # # Extract cleaned name
-                    names.append(name_tag.get_text(strip=True))    
-
+                    names.append(name_tag.get_text(strip=True))
+                    if table_class and table_class[0] == "borderOj":
+                        doc_title.append("COUNCIL_REGULATION _EU_ 2024_1485_27_May_2024")
+                        doc_number.append("02024R1485-20240913")
+                        doc_url.append("http://data.europa.eu/eli/reg/2024/1485/2024-09-13")
+                    else:
+                        doc_title.append("COUNCIL_REGULATION_EU_2024_2642_8_October_2024")
+                        doc_number.append("02024R2642-20241216")
+                        doc_url.append("http://data.europa.eu/eli/reg/2024/2642/2024-12-16")
+                    nationality.append("russia")
+    
         for row in rows:
             cols = row.find_all("td")
             if len(cols) > 1:  
@@ -44,15 +56,10 @@ def extract_EU_russia_data():
                 gender_found = False
                 for p_tag in info_col.find_all("p", class_="tbl-norm"):
                     text = p_tag.get_text(strip=True).replace(";", "")  
-                    # if "██████" in text:
-                    #     gender_found = True  # Mark it so we don’t add "MISSING"
-                    #     genders.append("unknown")
-                    #     break  
-                    # Fix cases where "Gender: Male" is on the same line with other info
                     if "gender" in text.lower():
                         parts = text.split(";")  
                         for part in parts:
-                            if "gender" in part.lower():  # Find the correct segment
+                            if "gender" in part.lower():  
                                 gender_value = part.split(":", 1)[-1].strip()
                                 genders.append(gender_value)
                                 gender_found = True
@@ -63,14 +70,14 @@ def extract_EU_russia_data():
         for row in rows:
             cols = row.find_all("td")
             if len(cols) > 1:  
-                reason_tags = cols[3].find_all("p", class_="tbl-norm")  # Get all <p> elements inside column 4
+                reason_tags = cols[3].find_all("p", class_="tbl-norm")  
                 if reason_tags:
                     reason_texts = []
                     for reason_tag in reason_tags:
                         for img in reason_tag.find_all("img"):
                             img.extract()
                         reason_texts.append(reason_tag.get_text(strip=True))
-                    reasons.append("; ".join(reason_texts))  # Joining multiple reasons with "; "                
+                    reasons.append("; ".join(reason_texts)) 
 
         for row in rows:
             try:
@@ -84,7 +91,6 @@ def extract_EU_russia_data():
                 for img in data_tag.find_all("img"):
                     img.decompose()
                 text = data_tag.get_text(strip=True)
-                # Normalize missing or placeholder data
                 if not text or text.strip() in {"██████", "None", "-", "--"}:
                     dates.append("unknown")
                 else:
@@ -97,8 +103,13 @@ def extract_EU_russia_data():
         "Name": names,
         "Gender": genders,
         "Reason": reasons,
-        "Dates": dates
-    })    
+        "Dates": dates,
+        "Doc_title": doc_title,
+        "Doc_number": doc_number,
+        "Doc_url": doc_url,
+        "Nationality": nationality
+        
+    })
 
     russia_df["Name"] = russia_df["Name"].str.replace(r"\(\)", "", regex=True).str.strip()
     russia_df["Gender"] = russia_df["Gender"].str.lower().str.strip()
@@ -107,13 +118,12 @@ def extract_EU_russia_data():
     russia_df["Dates"] = russia_df["Dates"].str.strip()
     russia_df["Dates"] = russia_df["Dates"].apply(format_date) 
 
-    female_count = russia_df["Gender"].str.lower().value_counts().get("female", 0)
-    print("Number of females:", female_count)
+    female_count = russia_df["Gender"].str.lower().value_counts().get
 
-    #print(len(names), len(genders), len(reasons), len(dates))
-    #print(russia_df.info())
+    print(len(names), len(genders), len(reasons), len(dates))
+    print(russia_df.info())
     return russia_df.to_csv(csv_path, index=False)
 
-
+    
 extract_EU_russia_data()
 

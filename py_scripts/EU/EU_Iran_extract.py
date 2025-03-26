@@ -22,6 +22,10 @@ def extract_EU_iran_data():
     genders = []
     reasons = []
     dates = []
+    doc_title = []
+    doc_number = []
+    doc_url = []
+    nationality = [] 
 
     table1 = soup.find("table", {"class": "borderOj"})
     rows_t1 = table1.find_all("tr")[1:]   
@@ -43,7 +47,7 @@ def extract_EU_iran_data():
                     for img in name_tag.find_all("img"):
                         img.extract()
                     # Extract cleaned name
-                    names.append(name_tag.get_text(strip=True))
+                    names.append(name_tag.get_text(strip=True))  
         
     # GENDER TABLE 1    
     for row in rows_t1:
@@ -116,7 +120,12 @@ def extract_EU_iran_data():
                 continue
             data_tag = cols[4].find("p", class_="tbl-left")
             text = data_tag.get_text(strip=True)     
-            dates.append(text)    
+            dates.append(text)  
+
+            doc_title.append("COUNCIL_REGULATION_EU_36_2012_18_January_2012")
+            doc_number.append("02012R0036-20241125")
+            doc_url.append("http://data.europa.eu/eli/reg/2012/36/2024-11-25")
+            nationality.append("iran")  
 
     # DATE TABLE 2
     for row in rows_t2:
@@ -125,13 +134,22 @@ def extract_EU_iran_data():
                 continue
             data_tag = cols[5].find("p", class_="tbl-left")
             text = data_tag.get_text(strip=True)     
-            dates.append(text)               
+            dates.append(text)    
+
+            doc_title.append("COUNCIL_REGULATION_EU_359_2011_12 April_2011")
+            doc_number.append("02011R0359-20240913")
+            doc_url.append("http://data.europa.eu/eli/reg/2023/1529/2024-10-14")
+            nationality.append("iran")           
 
     iran_df = pd.DataFrame({
         "Name": names,
         "Gender": genders,
         "Reason": reasons,
-        "Dates": dates
+        "Dates": dates,
+        "Doc_title": doc_title,
+        "Doc_number": doc_number,
+        "Doc_url": doc_url,
+        "Nationality": nationality
     })    
 
     iran_df["Name"] = iran_df["Name"].str.replace(r"\(\)", "", regex=True).str.strip()
