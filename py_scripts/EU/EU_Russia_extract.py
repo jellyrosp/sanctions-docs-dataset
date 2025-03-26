@@ -47,7 +47,7 @@ def extract_EU_russia_data():
                         doc_title.append("COUNCIL_REGULATION_EU_2024_2642_8_October_2024")
                         doc_number.append("02024R2642-20241216")
                         doc_url.append("http://data.europa.eu/eli/reg/2024/2642/2024-12-16")
-                    nationality.append("russia")
+                    nationality.append("Russia")
     
         for row in rows:
             cols = row.find_all("td")
@@ -120,8 +120,8 @@ def extract_EU_russia_data():
 
     female_count = russia_df["Gender"].str.lower().value_counts().get
 
-    print(len(names), len(genders), len(reasons), len(dates))
-    print(russia_df.info())
+   # print(len(names), len(genders), len(reasons), len(dates))
+   # print(russia_df.info())
     return russia_df.to_csv(csv_path, index=False)
 
     

@@ -40,7 +40,7 @@ def extract_EU_syria_data():
                 doc_title.append("COUNCIL_REGULATION_EU_36_2012_18_January_2012")
                 doc_number.append("02012R0036-20241125")
                 doc_url.append("http://data.europa.eu/eli/reg/2012/36/2024-11-25") 
-                nationality.append("syria")   
+                nationality.append("Syria")   
               
     for row in rows:
         cols = row.find_all("td")
@@ -118,8 +118,8 @@ def extract_EU_syria_data():
     syria_df = syria_df[~syria_df.isin(["unknown"]).any(axis=1)]
 
     #print(len(names), len(genders), len(reasons), len(dates))
-    print(syria_df.info())
-    #return syria_df.to_csv(csv_path, index=False)
+    #print(syria_df.info())
+    return syria_df.to_csv(csv_path, index=False)
 
 
 extract_EU_syria_data()

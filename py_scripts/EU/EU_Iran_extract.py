@@ -125,7 +125,7 @@ def extract_EU_iran_data():
             doc_title.append("COUNCIL_REGULATION_EU_36_2012_18_January_2012")
             doc_number.append("02012R0036-20241125")
             doc_url.append("http://data.europa.eu/eli/reg/2012/36/2024-11-25")
-            nationality.append("iran")  
+            nationality.append("Iran")  
 
     # DATE TABLE 2
     for row in rows_t2:
@@ -139,7 +139,7 @@ def extract_EU_iran_data():
             doc_title.append("COUNCIL_REGULATION_EU_359_2011_12 April_2011")
             doc_number.append("02011R0359-20240913")
             doc_url.append("http://data.europa.eu/eli/reg/2023/1529/2024-10-14")
-            nationality.append("iran")           
+            nationality.append("Iran")           
 
     iran_df = pd.DataFrame({
         "Name": names,
