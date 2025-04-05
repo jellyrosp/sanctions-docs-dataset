@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS Individual (
     individual_id INTEGER PRIMARY KEY AUTOINCREMENT,
     name          TEXT,
     gender        TEXT,
-    nationality   TEXT,
+    case_study   TEXT,
     reason_id        TEXT,
     FOREIGN KEY (
         reason_id
