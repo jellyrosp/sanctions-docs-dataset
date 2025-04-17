@@ -4,7 +4,7 @@ from datetime import datetime
 
 html_path = "sanctions/EU/Russia/Russia_jointed_TEXT.html"
 
-csv_path = "sanctions/EU/Russia/EU_russia_data.csv"
+csv_path = "sanctions/EU/Russia/EU_russia_data1.csv"
 
 def format_date(date_str):
     try:
@@ -26,6 +26,7 @@ def extract_EU_russia_data():
     doc_title = []
     doc_number = []
     doc_url = []
+    case_study = []
     nationality = [] 
 
 
@@ -47,13 +48,14 @@ def extract_EU_russia_data():
                         doc_title.append("COUNCIL_REGULATION_EU_2024_2642_8_October_2024")
                         doc_number.append("02024R2642-20241216")
                         doc_url.append("http://data.europa.eu/eli/reg/2024/2642/2024-12-16")
-                    nationality.append("Russia")
+                    case_study.append("Russia")
     
         for row in rows:
             cols = row.find_all("td")
             if len(cols) > 1:  
                 info_col = cols[2] 
                 gender_found = False
+                nat_found = False
                 for p_tag in info_col.find_all("p", class_="tbl-norm"):
                     text = p_tag.get_text(strip=True).replace(";", "")  
                     if "gender" in text.lower():
@@ -63,9 +65,20 @@ def extract_EU_russia_data():
                                 gender_value = part.split(":", 1)[-1].strip()
                                 genders.append(gender_value)
                                 gender_found = True
-                                break  
+                                break 
+                    if "nationality" in text.lower():  
+                        parts = text.split(";")  
+                        for part in parts:
+                            if "nationality" in part.lower():  # ✅ Same typo fixed
+                                nat_value = part.split(":", 1)[-1].strip()
+                                nationality.append(nat_value)
+                                nat_found = True
+                                break              
                 if not gender_found:
-                    genders.append("unknown")        
+                    genders.append("unknown") 
+                if not nat_found:
+                    nationality.append("unknown") 
+       
 
         for row in rows:
             cols = row.find_all("td")
@@ -107,6 +120,7 @@ def extract_EU_russia_data():
         "Doc_title": doc_title,
         "Doc_number": doc_number,
         "Doc_url": doc_url,
+        "Case_study": case_study,
         "Nationality": nationality
         
     })
@@ -120,8 +134,8 @@ def extract_EU_russia_data():
 
     female_count = russia_df["Gender"].str.lower().value_counts().get
 
-   # print(len(names), len(genders), len(reasons), len(dates))
-   # print(russia_df.info())
+    # print(len(names), len(genders), len(reasons), len(dates))
+    # print(russia_df.info())
     return russia_df.to_csv(csv_path, index=False)
 
     

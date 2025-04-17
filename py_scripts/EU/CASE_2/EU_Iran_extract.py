@@ -4,7 +4,7 @@ from datetime import datetime
 
 html_path = "sanctions/EU/Iran/Iran_jointed_TEXT.html"
 
-csv_path = "sanctions/EU/Iran/EU_iran_data.csv"
+csv_path = "sanctions/EU/Iran/EU_iran_data1.csv"
 
 def format_date(date_str):
     try:
@@ -25,6 +25,7 @@ def extract_EU_iran_data():
     doc_title = []
     doc_number = []
     doc_url = []
+    case_study = []
     nationality = [] 
 
     table1 = soup.find("table", {"class": "borderOj"})
@@ -55,19 +56,37 @@ def extract_EU_iran_data():
         if len(cols) > 1:  
             info_col = cols[2] 
             gender_found = False
+            nat_found = False
+
             for p_tag in info_col.find_all("p", class_="tbl-norm"):
                 text = p_tag.get_text(strip=True).replace(";", "")  
-                # Fix cases where "Gender: Male" is on the same line with other info
+
+                # Check for gender
                 if "gender" in text.lower():
                     parts = text.split(";")  
                     for part in parts:
-                        if "gender" in part.lower():  # Find the correct segment
+                        if "gender" in part.lower():
                             gender_value = part.split(":", 1)[-1].strip()
                             genders.append(gender_value)
                             gender_found = True
-                            break  
+                            break 
+
+                # Check for nationality
+                if "nationality" in text.lower():  # ✅ Fixed typo: "nationalitiy" → "nationality"
+                    parts = text.split(";")  
+                    for part in parts:
+                        if "nationality" in part.lower():  # ✅ Same typo fixed
+                            nat_value = part.split(":", 1)[-1].strip()
+                            nationality.append(nat_value)
+                            nat_found = True
+                            break         
+
             if not gender_found:
                 genders.append("unknown")  
+
+            if not nat_found:
+                nationality.append("unknown") 
+
 
     # GENDER TABLE 2
     for row in rows_t2:
@@ -75,18 +94,36 @@ def extract_EU_iran_data():
         if len(cols) > 1:  
             info_col = cols[3] 
             gender_found = False
+            nat_found = False
+
             for p_tag in info_col.find_all("p", class_="tbl-norm"):
                 text = p_tag.get_text(strip=True).replace(";", "")  
+
+                # Check for gender
                 if "gender" in text.lower():
                     parts = text.split(";")  
                     for part in parts:
-                        if "gender" in part.lower():  
+                        if "gender" in part.lower():
                             gender_value = part.split(":", 1)[-1].strip()
                             genders.append(gender_value)
                             gender_found = True
-                            break  
+                            break 
+
+                # Check for nationality
+                if "nationality" in text.lower():  # ✅ Fixed typo: "nationalitiy" → "nationality"
+                    parts = text.split(";")  
+                    for part in parts:
+                        if "nationality" in part.lower():  # ✅ Same typo fixed
+                            nat_value = part.split(":", 1)[-1].strip()
+                            nationality.append(nat_value)
+                            nat_found = True
+                            break         
+
             if not gender_found:
                 genders.append("unknown")  
+
+            if not nat_found:
+                nationality.append("unknown")   
            
     # REASON TABLE 1
     for row in rows_t1:
@@ -125,7 +162,7 @@ def extract_EU_iran_data():
             doc_title.append("COUNCIL_REGULATION_EU_36_2012_18_January_2012")
             doc_number.append("02012R0036-20241125")
             doc_url.append("http://data.europa.eu/eli/reg/2012/36/2024-11-25")
-            nationality.append("Iran")  
+            case_study.append("Iran")  
 
     # DATE TABLE 2
     for row in rows_t2:
@@ -139,7 +176,7 @@ def extract_EU_iran_data():
             doc_title.append("COUNCIL_REGULATION_EU_359_2011_12 April_2011")
             doc_number.append("02011R0359-20240913")
             doc_url.append("http://data.europa.eu/eli/reg/2023/1529/2024-10-14")
-            nationality.append("Iran")           
+            case_study.append("Iran")           
 
     iran_df = pd.DataFrame({
         "Name": names,
@@ -149,6 +186,7 @@ def extract_EU_iran_data():
         "Doc_title": doc_title,
         "Doc_number": doc_number,
         "Doc_url": doc_url,
+        "Case_study": case_study,
         "Nationality": nationality
     })    
 
@@ -157,8 +195,11 @@ def extract_EU_iran_data():
     iran_df["Dates"] = iran_df["Dates"].str.strip()
     iran_df["Dates"] = iran_df["Dates"].apply(format_date) 
     
-    #print(len(names), len(genders), len(reasons), len(dates))
-    #print(iran_df.info())
+    # print(len(names), len(genders), len(reasons), len(dates))
+    # print(iran_df.info())
+    # print(nationality)
+    # print(f"Unknown: {nationality.count('unknown')}/{len(nationality)} ({(nationality.count('unknown') / len(nationality)) * 100:.2f}%)")
+
     return iran_df.to_csv(csv_path, index=False)
 
 

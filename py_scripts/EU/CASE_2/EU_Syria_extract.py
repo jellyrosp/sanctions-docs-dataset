@@ -3,8 +3,7 @@ import pandas as pd
 from datetime import datetime
 
 html_path = "sanctions/EU/Syria/32012R0036_25.11.2024/Consolidated_TEXT_32012R0036_25.11.2024_CLEANED.html"
-
-csv_path = "sanctions/EU/Syria/EU_syria_data.csv"
+csv_path = "sanctions/EU/Syria/EU_syria_data1.csv"
 
 def format_date(date_str):
     try:
@@ -27,6 +26,7 @@ def extract_EU_syria_data():
     doc_title = []
     doc_number = []
     doc_url = []
+    case_study = []
     nationality = [] 
 
     for row in rows: 
@@ -40,30 +40,43 @@ def extract_EU_syria_data():
                 doc_title.append("COUNCIL_REGULATION_EU_36_2012_18_January_2012")
                 doc_number.append("02012R0036-20241125")
                 doc_url.append("http://data.europa.eu/eli/reg/2012/36/2024-11-25") 
-                nationality.append("Syria")   
+                case_study.append("Syria")   
               
     for row in rows:
         cols = row.find_all("td")
         if len(cols) > 1:  
             info_col = cols[2] 
             gender_found = False
+            nat_found = False
+
             for p_tag in info_col.find_all("p", class_="tbl-norm"):
-                text = p_tag.get_text(strip=True).replace(";", "")  
-                if "██████" in text:
-                    gender_found = True  # Mark it so we don’t add "MISSING"
-                    genders.append("unknown")
-                    break  
-                # Fix cases where "Gender: Male" is on the same line with other info
-                if "gender" in text.lower():
-                    parts = text.split(";")  
-                    for part in parts:
-                        if "gender" in part.lower():  
+                text = p_tag.get_text(strip=True)
+
+                # Gender
+                if not gender_found and "gender" in text.lower():
+                    for part in text.split(";"):
+                        if "gender" in part.lower():
                             gender_value = part.split(":", 1)[-1].strip()
                             genders.append(gender_value)
                             gender_found = True
-                            break  
+                            break
+
+                # Nationality
+                if not nat_found and "nationality" in text.lower():
+                    for part in text.split(";"):
+                        if "nationality" in part.lower():
+                            nat_value = part.split(":", 1)[-1].strip()
+                            nationality.append(nat_value)
+                            nat_found = True
+                            break
+
+            # Append "unknown" if nothing was found
             if not gender_found:
-                genders.append("unknown")        
+                genders.append("unknown")
+            if not nat_found:
+                nationality.append("unknown")
+
+       
 
     for row in rows:
         cols = row.find_all("td")
@@ -105,6 +118,7 @@ def extract_EU_syria_data():
         "Doc_title": doc_title,
         "Doc_number": doc_number,
         "Doc_url": doc_url,
+        "Case_study": case_study,
         "Nationality": nationality
         
     })  
@@ -115,12 +129,9 @@ def extract_EU_syria_data():
     syria_df = syria_df[~syria_df.apply(lambda row: (row == 'unknown').all(), axis=1)]
     syria_df["Dates"] = syria_df["Dates"].str.strip()
     syria_df["Dates"] = syria_df["Dates"].apply(format_date) 
-    syria_df = syria_df[~syria_df.isin(["unknown"]).any(axis=1)]
-
-    #print(len(names), len(genders), len(reasons), len(dates))
-    #print(syria_df.info())
+    # print(len(names), len(genders), len(reasons), len(dates))
+    # print(syria_df.info())
     return syria_df.to_csv(csv_path, index=False)
-
 
 extract_EU_syria_data()
 

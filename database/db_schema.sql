@@ -60,4 +60,4 @@ CREATE TABLE Individual (
     gender TEXT,
     case_study TEXT,
     reason_id INTEGER REFERENCES Reason(reason_id)
-);
+, nationality TEXT);
