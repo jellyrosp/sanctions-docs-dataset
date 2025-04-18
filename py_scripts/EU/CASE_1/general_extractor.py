@@ -31,7 +31,7 @@ def html2csv_extract(html_path, csv_path, d_title, d_number, d_url, case_st):
         for row in rows:
             cols = row.find_all("td")
             if len(cols) > 1:
-                name_tag = cols[1].find("p", class_="tbl-norm")
+                name_tag = cols[0].find("p", class_="tbl-norm")
                 
                 if name_tag:
                     name = name_tag.get_text(strip=True)
@@ -48,7 +48,7 @@ def html2csv_extract(html_path, csv_path, d_title, d_number, d_url, case_st):
         for row in rows:
             cols = row.find_all("td")
             if len(cols) > 1:  
-                info_col = cols[2] 
+                info_col = cols[1] 
                 gender_found = False
                 nat_found = False
                 for p_tag in info_col.find_all("p", class_="tbl-norm"):
@@ -78,22 +78,24 @@ def html2csv_extract(html_path, csv_path, d_title, d_number, d_url, case_st):
         for row in rows:
             cols = row.find_all("td")
             if len(cols) > 1:  
-                reason_tags = cols[3].find_all("p", class_="tbl-norm")  
+                reason_tags = cols[2].find_all("p", class_="tbl-norm")  
                 if reason_tags:
                     reason_texts = []
                     for reason_tag in reason_tags:
                         for img in reason_tag.find_all("img"):
                             img.extract()
                         reason_texts.append(reason_tag.get_text(strip=True))
-                    reasons.append("; ".join(reason_texts))      
+                    reasons.append("; ".join(reason_texts)) 
+                if not reason_tag:
+                    reasons.append("unknown")         
 
         # DATE
         for row in rows:
             try:
                 cols = row.find_all("td")
-                if len(cols) <= 4:
+                if len(cols) <= 3:
                     continue
-                data_tag = cols[4].find("p", class_="tbl-left")
+                data_tag = cols[3].find("p", class_="tbl-left")
                 if not data_tag:
                     dates.append("unknown")
                     continue
@@ -108,8 +110,7 @@ def html2csv_extract(html_path, csv_path, d_title, d_number, d_url, case_st):
                 print(f"Skipping a row due to error: {e}")
                 dates.append("unknown")  
 
-               
-
+    
     num_rows = len(names)
     df = pd.DataFrame({
         "Name": names,
@@ -139,12 +140,12 @@ def html2csv_extract(html_path, csv_path, d_title, d_number, d_url, case_st):
 
 
 
-html_path = "sanctions/EU/Venezuela/Consolidated_TEXT_32017R2063_EN_13_09_2024_CLEANED.html"
-csv_path = "sanctions/EU/Venezuela/EU_Venezuela_data.csv"
-doc_title = "COUNCIL_REGULATION_EU_2017_2063_of_13_November_2017 "
-doc_num = "02017R2063-20250111"
-url = "http://data.europa.eu/eli/reg/2017/2063/2025-01-11"
-case_study = "Venezuela"
+html_path = "sanctions/EU/Chemical_weapons/Consolidated_TEXT_32018R1542_EN_13_09_2024_CLEANED.html"
+csv_path = "sanctions/EU/Chemical_weapons/EU_Chemical_weapons_data.csv"
+doc_title = "COUNCIL_REGULATION_EU_2018_1542_of_15_October_2018"
+doc_num = "02018R1542-20240913"
+url = "http://data.europa.eu/eli/reg/2018/1542/2024-09-13"
+case_study = "Chemical_weapons"
 
 
 html2csv_extract(html_path, csv_path, doc_title, doc_num, url, case_study)
