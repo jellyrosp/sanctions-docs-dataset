@@ -25,4 +25,4 @@ def export_notebook_to_pdf(notebook_path):
         print(f"❌ Error during conversion: {e}")
 
 # Example usage
-export_notebook_to_pdf("data_analysis/jup_notebook/REPORT.ipynb")
+export_notebook_to_pdf("REPORT.ipynb")
